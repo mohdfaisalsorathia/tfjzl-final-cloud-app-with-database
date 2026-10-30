@@ -136,6 +136,7 @@ def show_exam_result(request, course_id, submission_id):
     selected_ids = [c.id for c in selected_choices]
 
     total_score = 0
+    possible_score = 0
     # Collect all questions for the course (either directly or via lessons)
     questions = []
     for lesson in course.lesson_set.all():
@@ -148,12 +149,14 @@ def show_exam_result(request, course_id, submission_id):
                 questions.append(q)
 
     for question in questions:
-        selected_for_question = [c.id for c in selected_choices if c.question_id == question.id]
-        if question.is_get_score(selected_for_question):
+        possible_score += question.grade
+        if question.is_get_score(selected_ids):
             total_score += question.grade
 
     context['course'] = course
     context['grade'] = total_score
+    context['possible'] = possible_score
+    context['possible_score'] = possible_score
     context['submission'] = submission
     context['selected_ids'] = selected_ids
 
